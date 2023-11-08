@@ -117,7 +117,7 @@ async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
                 if status in ['success', 'error']:
                     break
 
-            except ConnectionClosed as ex:
+            except ConnectionClosed:
                 break
 
 
