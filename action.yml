@@ -3,8 +3,20 @@ description: "Invokes defined Ansible Semaphore task via API call and pools for 
 author: "gulbinas"
 inputs:
   myInput:
-    description: "Input to use"
+    description: "template id"
     default: "world"
+  api_key:
+    description: "api key for api AUTH"
+    default: "f4ws0obik6ilc1bxmk6gxwj2kiz_xvoenhl0ysnpst0="
+  api_url:
+    description: "api url"
+    default: "http://10.8.0.1:3000/api"
+  ws_api_url:
+    description: "ws api url"
+    default: "ws://10.8.0.1:3000/api"
+  project_id:
+    description: "project id"
+    default: 1
 outputs:
   myOutput:
     description: "Output from the action"

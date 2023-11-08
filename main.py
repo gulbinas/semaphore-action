@@ -9,9 +9,9 @@ from semaphore_client.model.project_project_id_tasks_get_request import ProjectP
 from semaphore_client.semaphore import project_api
 from websockets import ConnectionClosed
 
-API_KEY = 'f4ws0obik6ilc1bxmk6gxwj2kiz_xvoenhl0ysnpst0='
-API_URL = "http://10.8.0.1:3000/api"
-WS_API_URL = "ws://10.8.0.1:3000/api"
+API_KEY = os.environ["INPUT_API_KEY"]
+API_URL = os.environ["INPUT_API_URL"]
+WS_API_URL = os.environ["INPUT_WS_API_URL"]
 
 configuration = semaphore_client.Configuration(
     host=API_URL
@@ -136,7 +136,7 @@ def main():
     if my_input == "world":
         return 0
 
-    project_id = 1  # int | Project ID
+    project_id = os.environ["INPUT_PROJECT_ID"]
     # print_hi('PyCharm')
     task_id = start_task(int(my_input), project_id)
     with semaphore_client.ApiClient(configuration) as api_client:
