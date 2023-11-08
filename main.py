@@ -131,15 +131,15 @@ def main():
     my_input = os.environ["INPUT_MYINPUT"]
     my_output = f'Hello {my_input}'
     set_github_action_output('myOutput', my_output)
-
-    project_id = 1  # int | Project ID
-    print_hi('PyCharm')
-    task_id = start_task(29, project_id)
-    with semaphore_client.ApiClient(configuration) as api_client:
-        # Create an instance of the API class
-        api_instance = project_api.ProjectApi(api_client)
-
-        asyncio.run(pool_task_updates(task_id, api_instance, project_id))
+    #
+    # project_id = 1  # int | Project ID
+    # print_hi('PyCharm')
+    # task_id = start_task(29, project_id)
+    # with semaphore_client.ApiClient(configuration) as api_client:
+    #     # Create an instance of the API class
+    #     api_instance = project_api.ProjectApi(api_client)
+    #
+    #     asyncio.run(pool_task_updates(task_id, api_instance, project_id))
 
 
 if __name__ == '__main__':
