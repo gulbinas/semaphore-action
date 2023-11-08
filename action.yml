@@ -1,0 +1,13 @@
+name: "Semaphore task invocation action"
+description: "Invokes defined Ansible Semaphore task via API call and pools for result"
+author: "gulbinas"
+inputs:
+  myInput:
+    description: "Input to use"
+    default: "world"
+outputs:
+  myOutput:
+    description: "Output from the action"
+runs:
+  using: "docker"
+  image: "Dockerfile"
