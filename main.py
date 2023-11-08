@@ -136,7 +136,7 @@ def main():
     if my_input == "world":
         return 0
 
-    project_id = os.environ["INPUT_PROJECT_ID"]
+    project_id = int(os.environ["INPUT_PROJECT_ID"])
     # print_hi('PyCharm')
     task_id = start_task(int(my_input), project_id)
     with semaphore_client.ApiClient(configuration) as api_client:
