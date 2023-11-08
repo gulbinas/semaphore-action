@@ -1,5 +1,6 @@
 FROM ghcr.io/cicirello/pyaction:latest AS builder
 
+COPY . /app
 ADD . /app
 WORKDIR /app
 
@@ -16,4 +17,5 @@ RUN pip install --target=/app --requirement /app/requirements.txt
 
 ENV PYTHONPATH /app
 RUN python --version
+COPY . /app
 CMD ["/app/main.py"]
