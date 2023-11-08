@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS builder
+FROM python:3.9 AS builder
 ADD . /app
 WORKDIR /app
 
@@ -13,4 +13,4 @@ FROM gcr.io/distroless/python3-debian10
 COPY --from=builder /app /app
 WORKDIR /app
 ENV PYTHONPATH /app
-CMD ["/usr/bin/python3.9", "/app/main.py"]
+CMD ["/app/main.py"]
