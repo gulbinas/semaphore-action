@@ -21,6 +21,12 @@ configuration.api_key['bearer'] = API_KEY
 configuration.api_key_prefix['bearer'] = 'Bearer'
 
 
+def set_github_action_output(output_name, output_value):
+    f = open(os.path.abspath(os.environ["GITHUB_OUTPUT"]), "a")
+    f.write(f'{output_name}={output_value}')
+    f.close()
+
+
 def start_task(template_id, project_id=1):
     out = None
     with semaphore_client.ApiClient(configuration) as api_client:
@@ -108,10 +114,12 @@ async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
                 status = ''
                 if log_item.get('task_id', 0) == run_id:
                     print(f"{log_item}")
+                    set_github_action_output('myOutput', str(log_item))
                     status = log_item.get('status', '')
                 else:
                     task_object = get_task_status(run_id, project_id)
                     print(f"{task_object.to_dict()}")
+                    set_github_action_output('myOutput', str(task_object.to_dict()))
                     status = task_object.to_dict().get('status', '')
 
                 if status in ['success', 'error']:
@@ -121,20 +129,16 @@ async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
                 break
 
 
-def set_github_action_output(output_name, output_value):
-    f = open(os.path.abspath(os.environ["GITHUB_OUTPUT"]), "a")
-    f.write(f'{output_name}={output_value}')
-    f.close()
-
-
 def main():
     my_input = os.environ["INPUT_MYINPUT"]
     my_output = f'Hello {my_input}'
     set_github_action_output('myOutput', my_output)
+    if my_input == "world":
+        return 0
 
     project_id = 1  # int | Project ID
     # print_hi('PyCharm')
-    task_id = start_task(29, project_id)
+    task_id = start_task(my_input, project_id)
     with semaphore_client.ApiClient(configuration) as api_client:
         # Create an instance of the API class
         api_instance = project_api.ProjectApi(api_client)
