@@ -13,4 +13,4 @@ FROM gcr.io/distroless/python3-debian10
 COPY --from=builder /app /app
 WORKDIR /app
 ENV PYTHONPATH /app
-CMD ["python", "/app/main.py"]
+CMD ["/usr/bin/python3.9", "/app/main.py"]
