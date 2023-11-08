@@ -9,7 +9,7 @@ jobs:
         id: selftest
 
         # Put your action repo here
-        uses: gulbinas/semaphore-action@master
+        uses: gulbinas/semaphore-action@main
 
       - name: Check outputs
         run: |
