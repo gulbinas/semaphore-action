@@ -1,23 +1,12 @@
-import time
-import os
 import asyncio
-import websockets
-import semaphore_client
 import json
+import os
 import re
-from pprint import pprint
-from semaphore_client.semaphore import authentication_api
-from semaphore_client.semaphore import project_api
-from semaphore_client.semaphore import default_api
+
+import semaphore_client
+import websockets
 from semaphore_client.model.project_project_id_tasks_get_request import ProjectProjectIdTasksGetRequest
-from semaphore_client.model.task import Task
-from semaphore_client.model.api_token import APIToken
-from semaphore_client.model.login import Login
-
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from semaphore_client.semaphore import project_api
 from websockets import ConnectionClosed
 
 API_KEY = 'f4ws0obik6ilc1bxmk6gxwj2kiz_xvoenhl0ysnpst0='
@@ -28,24 +17,10 @@ configuration = semaphore_client.Configuration(
     host=API_URL
 )
 
-
-# The client must configure the authentication and authorization parameters
-# in accordance with the API server security policy.
-# Examples for each auth method are provided below, use the example that
-# satisfies your auth use case.
-
-# Configure API key authorization: bearer
 configuration.api_key['bearer'] = API_KEY
-
-# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
 configuration.api_key_prefix['bearer'] = 'Bearer'
 
 
-# Configure API key authorization: cookie
-#configuration.api_key['cookie'] = 'semaphore=MTY5OTQyNTkxOHxORlZweXBLaWN4c1NFYW5rNDd2VXp6MmQzSmMwT082QlBNdE92cDJfamZKYnhEVE1lY3RFb3dnREp5dG5SaTBLOEJZcGxHQVNSRWtCZXRWdXpqUE9aaEE9fOSfyO-B-aeugZnoX75lpOj_FQ1XuDhBPJ7fURcVxduM'
-
-# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-#configuration.api_key_prefix['cookie'] = 'Bearer'
 def start_task(template_id, project_id=1):
     out = None
     with semaphore_client.ApiClient(configuration) as api_client:
@@ -69,7 +44,7 @@ def start_task(template_id, project_id=1):
         try:
             # Starts a job
             api_response = api_instance.project_project_id_tasks_post(project_id, task)
-            #pprint(api_response)
+            # pprint(api_response)
             out = api_response['id']
         except semaphore_client.ApiException as e:
             print("Exception when calling ProjectApi->project_project_id_tasks_post: %s\n" % e)
@@ -102,15 +77,16 @@ def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
+
 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 
 async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
-    def get_task_status(task_id=None, project_id=1):
+    def get_task_status(task_id, the_project_id):
         out = None
         try:
             # Get a single task
-            api_response = api_instance.project_project_id_tasks_task_id_get(project_id, task_id)
+            api_response = api_instance.project_project_id_tasks_task_id_get(the_project_id, task_id)
             out = api_response
         except semaphore_client.ApiException as e:
             print("Exception when calling ProjectApi->project_project_id_tasks_task_id_get: %s\n" % e)
@@ -144,6 +120,7 @@ async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
             except ConnectionClosed as ex:
                 break
 
+
 def set_github_action_output(output_name, output_value):
     f = open(os.path.abspath(os.environ["GITHUB_OUTPUT"]), "a")
     f.write(f'{output_name}={output_value}')
@@ -165,8 +142,5 @@ def main():
         asyncio.run(pool_task_updates(task_id, api_instance, project_id))
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
