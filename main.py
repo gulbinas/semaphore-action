@@ -1,4 +1,3 @@
-#!/usr/bin/env -S python3 -B
 import asyncio
 import json
 import os
