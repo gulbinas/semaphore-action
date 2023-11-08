@@ -138,7 +138,7 @@ def main():
 
     project_id = 1  # int | Project ID
     # print_hi('PyCharm')
-    task_id = start_task(my_input, project_id)
+    task_id = start_task(int(my_input), project_id)
     with semaphore_client.ApiClient(configuration) as api_client:
         # Create an instance of the API class
         api_instance = project_api.ProjectApi(api_client)
