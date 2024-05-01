@@ -1,4 +1,4 @@
-ansible-semaphore-client @ git+https://github.com/gulbinas/libpython-semaphore-client.git@f92a7e4c702fdb5dba17108489fc9ec18fe8cd0e
+semaphore_client @ git+https://github.com/gulbinas/libpython-semaphore-client.git
 cffi==1.16.0
 importlib-metadata==6.8.0
 milksnake==0.1.6
