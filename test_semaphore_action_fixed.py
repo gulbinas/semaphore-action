@@ -241,7 +241,7 @@ async def test_websocket_connection_closed(mock_websocket_connect, mock_env):
     mock_api_instance = Mock()
     
     # Run the test - should not raise exception
-    await main.pool_task_updates(1011, mock_api_instance, 1)
+    await main.poll_task_updates(1011, mock_api_instance, 1)
     
     # Verify WebSocket connection was attempted
     mock_websocket_connect.assert_called_once()
@@ -262,7 +262,7 @@ def test_main_function_world_input(mock_set_output, mock_start_task, mock_env):
 
 @patch('main.start_task')
 @patch('main.set_github_action_output')
-@patch('main.pool_task_updates')
+@patch('main.poll_task_updates')
 @patch('semaphore_client.ApiClient')
 @patch('main.project_api.ProjectApi')
 def test_main_function_template_execution(mock_project_api, mock_api_client, mock_pool_updates, mock_set_output, mock_start_task, mock_env):
