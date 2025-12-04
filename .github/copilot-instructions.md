@@ -99,7 +99,7 @@ semaphore-action/
 - Use semaphore_client library for API interactions
 - Configure API client with bearer token authentication
 - Strip ANSI escape codes from WebSocket log output using `ansi_escape` regex
-- Poll WebSocket for task updates until status is 'success' or 'error'
+- Polls WebSocket for task updates until status is 'success' or 'error'
 - Handle `ConnectionClosed` exceptions for WebSocket disconnections
 
 ## Security Best Practices
