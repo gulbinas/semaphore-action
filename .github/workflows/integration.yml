@@ -1,14 +1,16 @@
 name: Integration Test
 on: [push]
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - name: Self test
         id: selftest
-
-        # Put your action repo here
         uses: gulbinas/semaphore-action@main
 
       - name: Check outputs

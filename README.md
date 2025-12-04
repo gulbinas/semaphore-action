@@ -90,7 +90,7 @@ Get automatic updates for bug fixes and new features within the same major versi
 Pin to a specific version for guaranteed reproducibility:
 
 ```yaml
-- name: Run Semaphore Task  
+- name: Run Semaphore Task
   uses: gulbinas/semaphore-action@v1.2.3
   with:
     myInput: world
