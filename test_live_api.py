@@ -6,7 +6,6 @@ Tests against the real API at 10.8.0.1 to verify functionality
 
 import os
 import asyncio
-import json
 import time
 from unittest.mock import patch
 
