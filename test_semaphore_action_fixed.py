@@ -4,7 +4,6 @@ Comprehensive Unit Tests for Semaphore GitHub Action
 Tests all functionality using real API response data
 """
 
-import asyncio
 import json
 import os
 import pytest
