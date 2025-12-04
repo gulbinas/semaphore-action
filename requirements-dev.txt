@@ -1,0 +1,19 @@
+# Development requirements for enhanced testing and quality
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.10.0
+pytest-cov>=4.0.0
+
+# Code quality tools
+flake8>=6.0.0
+black>=23.0.0
+bandit>=1.7.0
+safety>=2.0.0
+
+# Documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.2.0
+
+# Development utilities
+pre-commit>=3.0.0
+tox>=4.0.0

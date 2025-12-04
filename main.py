@@ -87,7 +87,7 @@ def print_hi(name):
 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 
-async def pool_task_updates(run_id=None, api_instance=None, project_id=None):
+async def poll_task_updates(run_id=None, api_instance=None, project_id=None):
     def get_task_status(task_id, the_project_id):
         out = None
         try:
@@ -143,7 +143,7 @@ def main():
         # Create an instance of the API class
         api_instance = project_api.ProjectApi(api_client)
 
-        asyncio.run(pool_task_updates(task_id, api_instance, project_id))
+        asyncio.run(poll_task_updates(task_id, api_instance, project_id))
 
 
 if __name__ == '__main__':
