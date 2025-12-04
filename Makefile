@@ -122,8 +122,17 @@ docker-build: ## Build Docker image
 
 .PHONY: docker-test
 docker-test: docker-build ## Test in Docker environment
-	@echo "Testing in Docker container..."
-	docker run --rm -e INPUT_MYINPUT=world semaphore-action
+	@echo "Testing in Docker container with required environment variables..."
+	@echo "Environment: INPUT_MYINPUT=world (for early return test)"
+	docker run --rm \
+		-e INPUT_MYINPUT=world \
+		-e INPUT_API_KEY=dummy_key_for_test \
+		-e INPUT_API_URL=http://dummy.example.com/api \
+		-e INPUT_WS_API_URL=ws://dummy.example.com/api \
+		-e INPUT_PROJECT_ID=1 \
+		-e GITHUB_OUTPUT=/tmp/github_output \
+		semaphore-action
+	@echo "✅ Docker test completed successfully"
 
 # Cleanup targets
 .PHONY: clean

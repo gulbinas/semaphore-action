@@ -1,0 +1,45 @@
+# Exclude development and testing files from Docker build context
+.git
+.github
+.gitignore
+.idea
+.vscode
+.pre-commit-config.yaml
+
+# Python cache and testing artifacts
+__pycache__
+.pytest_cache
+htmlcov
+.coverage
+*.pyc
+*.pyo
+*.egg-info
+
+# Virtual environment
+.venv
+.env*
+
+# Test files (not needed in production container)
+test_*.py
+*_test.py
+tests/
+
+# Documentation
+*.md
+!README.md
+
+# Temporary files
+*.tmp
+*.log
+asd
+demo_*.sh
+
+# macOS
+.DS_Store
+
+# Development requirements
+requirements-dev.txt
+
+# Build artifacts
+dist/
+build/
