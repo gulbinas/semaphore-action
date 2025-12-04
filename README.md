@@ -140,21 +140,24 @@ This action uses automated releases with semantic versioning:
 
 For detailed information about the release process, branching strategy, and contribution guidelines, see [RELEASE_STRATEGY.md](RELEASE_STRATEGY.md).
 
-```yaml
-steps:
-- uses: actions/checkout@master
-- name: Run action
-  id: myaction
+## Contributing
 
-  # Put your action name here
-  uses: me/myaction@master
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 
-  # Put an example of your mandatory arguments here
-  with:
-    myInput: world
+- Development workflow
+- Branching strategy
+- Commit message format
+- Pull request process
+- Testing guidelines
 
-# Put an example of using your outputs here
-- name: Check outputs
-    run: |
-    echo "Outputs - ${{ steps.myaction.outputs.myOutput }}"
+### Quick Links
+
+- [Quick Start Guide](QUICK_START.md) - Fast reference for common tasks
+- [Release Strategy](RELEASE_STRATEGY.md) - Detailed release and branching documentation
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute to this project
+
+## License
+
+See [LICENSE](LICENSE) file for details.
+
 ```
