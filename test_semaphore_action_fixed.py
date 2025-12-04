@@ -215,7 +215,7 @@ async def test_websocket_polling_success(mock_set_output, mock_websocket_connect
     mock_api_instance.project_project_id_tasks_task_id_get.return_value = mock_task_response
     
     # Run the test
-    await main.pool_task_updates(1011, mock_api_instance, 1)
+    await main.poll_task_updates(1011, mock_api_instance, 1)
     
     # Verify WebSocket connection
     mock_websocket_connect.assert_called_once_with(
