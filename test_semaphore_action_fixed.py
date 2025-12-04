@@ -8,7 +8,7 @@ import json
 import os
 import pytest
 import tempfile
-from unittest.mock import Mock, patch, AsyncMock, MagicMock, mock_open
+from unittest.mock import Mock, patch, AsyncMock
 import re
 
 # Test environment setup
