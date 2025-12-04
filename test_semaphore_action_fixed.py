@@ -9,7 +9,6 @@ import os
 import pytest
 import tempfile
 from unittest.mock import Mock, patch, AsyncMock
-import re
 
 # Test environment setup
 TEST_ENV = {
