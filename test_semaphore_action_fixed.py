@@ -36,6 +36,7 @@ def temp_output_file():
     try:
         os.unlink(temp_file.name)
     except FileNotFoundError:
+        # It's safe to ignore if the file was already deleted.
         pass
 
 def get_real_task_creation_response():
