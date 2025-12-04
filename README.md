@@ -12,7 +12,17 @@ In `main.py` you will find a small example of accessing Action inputs and return
 
 ## Usage
 
-Describe how to use your action here.
+Semaphore Action allows you to invoke Ansible Semaphore tasks from your GitHub Actions workflows.
+
+### Versioning
+
+This action uses semantic versioning with automated releases. You can reference it in several ways:
+
+- **Recommended**: Use major version tag (e.g., `@v1`) for automatic updates within the same major version
+- **Stable**: Use specific version tag (e.g., `@v1.2.3`) for guaranteed reproducibility
+- **Development**: Use `@main` for the latest changes (not recommended for production)
+
+See [RELEASE_STRATEGY.md](RELEASE_STRATEGY.md) for detailed information about the release process.
 
 ### Example workflow
 
@@ -23,13 +33,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Run action
+    - uses: actions/checkout@v4
+    - name: Run Semaphore Task
+      uses: gulbinas/semaphore-action@v1  # Use latest v1.x.x version
+      with:
+        myInput: world
+        api_key: ${{ secrets.SEMAPHORE_API_KEY }}
+        api_url: ${{ secrets.SEMAPHORE_API_URL }}
+        ws_api_url: ${{ secrets.SEMAPHORE_WS_API_URL }}
+        project_id: 1
+```
 
-      # Put your action repo here
-      uses: me/myaction@master
+### Using Specific Version
 
-      # Put an example of your mandatory inputs here
+For critical workflows, pin to a specific version:
+
+```yaml
+    - name: Run Semaphore Task
+      uses: gulbinas/semaphore-action@v1.2.3  # Pin to specific version
       with:
         myInput: world
 ```
@@ -49,7 +70,35 @@ jobs:
 
 ## Examples
 
-> NOTE: People ❤️ cut and paste examples. Be generous with them!
+### Using Major Version Tag (Recommended)
+
+Get automatic updates for bug fixes and new features within the same major version:
+
+```yaml
+- name: Run Semaphore Task
+  uses: gulbinas/semaphore-action@v1
+  with:
+    myInput: world
+    api_key: ${{ secrets.SEMAPHORE_API_KEY }}
+    api_url: ${{ secrets.SEMAPHORE_API_URL }}
+    ws_api_url: ${{ secrets.SEMAPHORE_WS_API_URL }}
+    project_id: 1
+```
+
+### Using Specific Version Tag
+
+Pin to a specific version for guaranteed reproducibility:
+
+```yaml
+- name: Run Semaphore Task  
+  uses: gulbinas/semaphore-action@v1.2.3
+  with:
+    myInput: world
+    api_key: ${{ secrets.SEMAPHORE_API_KEY }}
+    api_url: ${{ secrets.SEMAPHORE_API_URL }}
+    ws_api_url: ${{ secrets.SEMAPHORE_WS_API_URL }}
+    project_id: 1
+```
 
 ### Using the optional input
 
@@ -63,7 +112,33 @@ with:
 
 ### Using outputs
 
-Show people how to use your outputs in another action.
+```yaml
+steps:
+- uses: actions/checkout@v4
+- name: Run Semaphore Task
+  id: semaphore
+  uses: gulbinas/semaphore-action@v1
+  with:
+    myInput: world
+    api_key: ${{ secrets.SEMAPHORE_API_KEY }}
+    api_url: ${{ secrets.SEMAPHORE_API_URL }}
+    ws_api_url: ${{ secrets.SEMAPHORE_WS_API_URL }}
+    project_id: 1
+
+- name: Check outputs
+  run: |
+    echo "Outputs - ${{ steps.semaphore.outputs.myOutput }}"
+```
+
+## Release Information
+
+This action uses automated releases with semantic versioning:
+
+- **Tags**: Each release is tagged with a version number (e.g., `v1.2.3`)
+- **Major version tags**: Automatically updated to point to the latest release in that major version (e.g., `v1` → `v1.2.3`)
+- **Changelog**: Automatically generated for each release
+
+For detailed information about the release process, branching strategy, and contribution guidelines, see [RELEASE_STRATEGY.md](RELEASE_STRATEGY.md).
 
 ```yaml
 steps:
