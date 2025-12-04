@@ -1,11 +1,12 @@
-name: PR Testing and Validation
+name: Develop Branch CI
 
 on:
-  pull_request:
-    branches: [ main, master, develop ]
-    types: [ opened, synchronize, reopened ]
   push:
-    branches: [ main, master, develop ]
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
 
 permissions:
   contents: read
@@ -177,8 +178,8 @@ jobs:
           safety-report.json
 
   # Final validation job
-  pr-validation:
-    name: PR Ready for Merge
+  develop-validation:
+    name: Develop Branch Ready
     runs-on: ubuntu-latest
     needs: [validate, test, docker-test, integration-test, security]
     if: always()
@@ -196,16 +197,16 @@ jobs:
            [ "${{ needs.test.result }}" != "success" ] || \
            [ "${{ needs.docker-test.result }}" != "success" ] || \
            [ "${{ needs.integration-test.result }}" != "success" ]; then
-          echo "❌ Some checks failed. PR is not ready for merge."
+          echo "❌ Some checks failed. Develop branch validation failed."
           exit 1
         fi
         
-        echo "✅ All checks passed! PR is ready for merge."
+        echo "✅ All checks passed! Develop branch is healthy."
 
     - name: Post success message
       run: |
-        echo "🎉 All validation checks passed!"
-        echo "📊 This PR has been thoroughly tested:"
+        echo "🎉 All validation checks passed on develop branch!"
+        echo "📊 This commit has been thoroughly tested:"
         echo "   ✅ Code validation and linting"
         echo "   ✅ Unit tests with coverage"
         echo "   ✅ Multi-Python version compatibility"  
@@ -213,4 +214,4 @@ jobs:
         echo "   ✅ Integration testing"
         echo "   ✅ Security scanning"
         echo ""
-        echo "This PR is ready to merge! 🚀"
+        echo "Ready to merge to main when ready! 🚀"

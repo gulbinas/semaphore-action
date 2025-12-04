@@ -1,0 +1,147 @@
+name: Release and Tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          # Get the latest tag, or use v0.0.0 if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest tag: ${LATEST_TAG}"
+
+      - name: Determine next version
+        id: next_version
+        run: |
+          LATEST_TAG="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          
+          # Remove 'v' prefix for version calculation
+          VERSION=${LATEST_TAG#v}
+          
+          # Split version into major, minor, patch
+          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+          MAJOR="${VERSION_PARTS[0]:-0}"
+          MINOR="${VERSION_PARTS[1]:-0}"
+          PATCH="${VERSION_PARTS[2]:-0}"
+          
+          # Check commit messages to determine version bump type
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          if echo "$COMMIT_MSG" | grep -qiE '\[major\]|breaking change'; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            BUMP_TYPE="major"
+          elif echo "$COMMIT_MSG" | grep -qiE '\[minor\]|feat:|feature:'; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            BUMP_TYPE="minor"
+          else
+            PATCH=$((PATCH + 1))
+            BUMP_TYPE="patch"
+          fi
+          
+          NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "bump_type=${BUMP_TYPE}" >> $GITHUB_OUTPUT
+          echo "Next version: ${NEW_VERSION} (${BUMP_TYPE} bump)"
+
+      - name: Update major version tag
+        id: update_major_tag
+        run: |
+          NEW_VERSION="${{ steps.next_version.outputs.new_version }}"
+          MAJOR_VERSION=$(echo "$NEW_VERSION" | cut -d. -f1)
+          
+          echo "major_version=${MAJOR_VERSION}" >> $GITHUB_OUTPUT
+          echo "Major version tag: ${MAJOR_VERSION}"
+
+      - name: Create and push tags
+        run: |
+          NEW_VERSION="${{ steps.next_version.outputs.new_version }}"
+          MAJOR_VERSION="${{ steps.update_major_tag.outputs.major_version }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create annotated tag for the specific version
+          git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
+          
+          # Force update the major version tag (e.g., v1)
+          git tag -f -a "${MAJOR_VERSION}" -m "Release ${MAJOR_VERSION} (latest: ${NEW_VERSION})"
+          
+          # Push tags
+          git push origin "${NEW_VERSION}"
+          git push origin "${MAJOR_VERSION}" --force
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          NEW_VERSION="${{ steps.next_version.outputs.new_version }}"
+          LATEST_TAG="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          
+          # Generate changelog
+          if [ "$LATEST_TAG" = "v0.0.0" ]; then
+            # First release - get all commits
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits since last tag
+            CHANGELOG=$(git log ${LATEST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Save changelog to file
+          echo "## What's Changed" > changelog.md
+          echo "" >> changelog.md
+          echo "$CHANGELOG" >> changelog.md
+          echo "" >> changelog.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${LATEST_TAG}...${NEW_VERSION}" >> changelog.md
+          
+          cat changelog.md
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.next_version.outputs.new_version }}
+          release_name: Release ${{ steps.next_version.outputs.new_version }}
+          body_path: changelog.md
+          draft: false
+          prerelease: false
+
+      - name: Update release summary
+        run: |
+          NEW_VERSION="${{ steps.next_version.outputs.new_version }}"
+          MAJOR_VERSION="${{ steps.update_major_tag.outputs.major_version }}"
+          BUMP_TYPE="${{ steps.next_version.outputs.bump_type }}"
+          
+          echo "## 🚀 Release Created!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${NEW_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type**: ${BUMP_TYPE} version bump" >> $GITHUB_STEP_SUMMARY
+          echo "- **Major version tag**: ${MAJOR_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Usage" >> $GITHUB_STEP_SUMMARY
+          echo '```yaml' >> $GITHUB_STEP_SUMMARY
+          echo "uses: ${{ github.repository }}@${NEW_VERSION}  # Specific version" >> $GITHUB_STEP_SUMMARY
+          echo "uses: ${{ github.repository }}@${MAJOR_VERSION}      # Latest ${MAJOR_VERSION}.x.x version" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

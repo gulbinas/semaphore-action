@@ -1,0 +1,146 @@
+name: Create Release PR
+
+# This workflow can be manually triggered to create a PR from develop to main
+# for releasing a new version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Type of version bump'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'patch'
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Get current version
+        id: current_version
+        run: |
+          # Get the latest tag, or use v0.0.0 if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "current_version=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Current version: ${LATEST_TAG}"
+
+      - name: Calculate next version
+        id: next_version
+        run: |
+          CURRENT="${{ steps.current_version.outputs.current_version }}"
+          BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+          
+          # Remove 'v' prefix
+          VERSION=${CURRENT#v}
+          
+          # Split version
+          IFS='.' read -r -a PARTS <<< "$VERSION"
+          MAJOR="${PARTS[0]:-0}"
+          MINOR="${PARTS[1]:-0}"
+          PATCH="${PARTS[2]:-0}"
+          
+          # Bump version based on input
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+          
+          NEXT_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "next_version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
+          echo "Next version will be: ${NEXT_VERSION}"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          CURRENT="${{ steps.current_version.outputs.current_version }}"
+          
+          # Generate changelog
+          if [ "$CURRENT" = "v0.0.0" ]; then
+            CHANGES=$(git log origin/main..develop --pretty=format:"- %s (%h)" --no-merges | head -20)
+          else
+            CHANGES=$(git log origin/main..develop --pretty=format:"- %s (%h)" --no-merges | head -20)
+          fi
+          
+          # Save to file for PR body
+          cat > pr_body.md << 'EOF'
+          ## Release PR: Develop → Main
+          
+          This PR merges the latest changes from develop into main, which will trigger an automatic release.
+          
+          ### Version Information
+          - **Current version**: ${{ steps.current_version.outputs.current_version }}
+          - **Next version**: ${{ steps.next_version.outputs.next_version }}
+          - **Bump type**: ${{ github.event.inputs.version_bump }}
+          
+          ### Recent Changes
+          
+          EOF
+          
+          echo "$CHANGES" >> pr_body.md
+          
+          cat >> pr_body.md << 'EOF'
+          
+          ### What happens after merge?
+          
+          1. The release workflow will automatically run
+          2. A new version tag will be created: ${{ steps.next_version.outputs.next_version }}
+          3. A GitHub release will be published with full changelog
+          4. Major version tag will be updated
+          
+          ### Before merging
+          
+          - [ ] All CI checks are passing
+          - [ ] Changes have been tested
+          - [ ] Documentation is updated
+          - [ ] Breaking changes are documented (if any)
+          
+          EOF
+          
+          cat pr_body.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release-pr-${{ steps.next_version.outputs.next_version }}
+          base: main
+          title: "Release ${{ steps.next_version.outputs.next_version }}"
+          body-path: pr_body.md
+          labels: |
+            release
+            ${{ github.event.inputs.version_bump }}
+          assignees: ${{ github.actor }}
+
+      - name: Summary
+        run: |
+          echo "## 📋 Release PR Created!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "A pull request has been created to merge develop into main." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target version**: ${{ steps.next_version.outputs.next_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bump type**: ${{ github.event.inputs.version_bump }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "After the PR is merged, the release workflow will automatically:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Create version tag ${{ steps.next_version.outputs.next_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update major version tag" >> $GITHUB_STEP_SUMMARY
+          echo "3. Publish GitHub release" >> $GITHUB_STEP_SUMMARY

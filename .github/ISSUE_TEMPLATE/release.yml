@@ -1,0 +1,79 @@
+name: Request Release
+description: Request a new release of the action
+title: "[Release] "
+labels: ["release"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for requesting a release! Please provide the information below.
+        
+  - type: dropdown
+    id: version_type
+    attributes:
+      label: Version Bump Type
+      description: What type of version bump should this be?
+      options:
+        - Patch (bug fixes, minor changes)
+        - Minor (new features, backwards compatible)
+        - Major (breaking changes)
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: Key Changes
+      description: What are the main changes that should be included in this release?
+      placeholder: |
+        - Fixed timeout issue in API calls
+        - Added retry mechanism for failed requests
+        - Updated documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing
+      description: How have these changes been tested?
+      placeholder: |
+        - All unit tests passing
+        - Tested in production workflow
+        - Manual testing completed
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-release Checklist
+      description: Please verify the following before requesting a release
+      options:
+        - label: All CI checks are passing on develop branch
+          required: true
+        - label: Changes have been tested
+          required: true
+        - label: Documentation has been updated (if needed)
+          required: true
+        - label: CHANGELOG or commit messages are descriptive
+          required: true
+        - label: No breaking changes (or they are documented for major release)
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        ## What happens next?
+        
+        1. A maintainer will review this request
+        2. If approved, they will run the "Create Release PR" workflow
+        3. A PR from develop to main will be created
+        4. After PR review and merge, the release will be automatically published
+        
+        You can also create a release PR yourself if you have write access:
+        1. Go to Actions → Create Release PR
+        2. Choose version bump type
+        3. Review and merge the created PR
